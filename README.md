@@ -70,4 +70,4 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 
 
-### `uso do "npm install zustand", "npm install react-hot-toast"`
+### `uso do "npm install zustand", "npm install react-hot-toast", "npm install bootstrap react-bootstrap"`

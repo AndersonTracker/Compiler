@@ -52,6 +52,22 @@ export const getTerminal = () => {
   )).sort().concat('$');
 };
 
+function SentenceFunc() {
+  let sentence = "S", steps = 0;
+  while (steps < 15) {
+    const match = sentence.match(/[A-Z]/);
+    if (!match) return sentence;
+
+    const nTerminal = match[0];
+    const rule = grammar.find(r => r.key === nTerminal);
+    const prod = rule.list[Math.floor(Math.random() * rule.list.length)];
+
+    sentence = sentence.replace(nTerminal, prod.production !== end ? prod.production : '');
+    steps++;
+  }
+  return SentenceFunc();
+}
+
 export const ControllerGlobal = create((set) => ({
   state: {
     grammar: grammar,
@@ -67,8 +83,19 @@ export const ControllerGlobal = create((set) => ({
     log: ''
   },
   actions: {
+    SentenceSuccess: () => set(state => {
+      const s = SentenceFunc();
+      return { state: { ...state.state, sentence: s, resolver: [], iteration: 0, pile: "$S", entry: "", end: false, action: '', topEntry: s[0], log: '' } };
+    }),
+    SentenceError: () => set(state => {
+      const s = SentenceFunc();
+      const sErr = s + s[s.length - 1];
+      return { state: { ...state.state, sentence: sErr, resolver: [], iteration: 0, pile: "$S", entry: "", end: false, action: '', topEntry: sErr[0], log: '' } };
+    }),
     changeSentenceGrammar: (s) => set(state => ({
       state: { ...state.state, sentence: s, resolver: [], iteration: 0, pile: "$S", entry: "", end: false, action: '', topEntry: s[0], log: '' }
     }))
   }
 }));
+
+
