@@ -13,7 +13,8 @@ function App() {
       SentenceSuccess,
       next,
       SentenceError,
-      changeSentenceGrammar 
+      changeSentenceGrammar,
+      ResolverSentence
     }} = ControllerGlobal();
 
   return (
@@ -34,7 +35,7 @@ function App() {
             </div>
             <div className="d-flex input-group-append gap-3 mt-2">
                 <Button className="btn btn-warning" style={{ border: 'none', fontWeight: 'bolder' }} onClick={next}>Next</Button>
-                <Button style={{ backgroundColor: 'green', color: 'black', border: 'none', fontWeight: 'bolder' }} >Resolver Sentence</Button>
+                <Button style={{ backgroundColor: 'green', color: 'black', border: 'none', fontWeight: 'bolder' }} onClick={ResolverSentence} >Resolver Sentence</Button>
                 
                 <Button style={{ backgroundColor: 'black', color: 'white', border: 'none', fontWeight: 'bolder', marginLeft: "auto"}} >Table</Button>
             </div>

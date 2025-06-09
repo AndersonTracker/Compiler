@@ -131,6 +131,11 @@ export const ControllerGlobal = create((set) => ({
       const newState = next(state.state);
       return { state: { ...state.state, ...newState } };
     }),
+    ResolverSentence: () => set(state => {
+      let newState = next(state.state);
+      while (!newState.end) newState = next({ ...state.state, ...newState });
+      return { state: { ...state.state, ...newState } };
+    }),
   }
 }));
 
