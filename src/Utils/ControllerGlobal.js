@@ -1,7 +1,7 @@
 
 import { create } from 'zustand';
 
-export const end = "ε";
+export const ended = "ε";
 
 export const grammar = [
   {
@@ -9,39 +9,28 @@ export const grammar = [
     list: [
       { nonTerminal: "S", initial: ["a"], production: "aA" },
       { nonTerminal: "S", initial: ["b"], production: "bB" },
-      { nonTerminal: "S", initial: ["c"], production: "Cc" },
-      { nonTerminal: "S", initial: ["d"], production: "-" },
-      { nonTerminal: "S", initial: ["$"], production: "-" },
+      { nonTerminal: "S", initial: ["c"], production: "Cc" }
     ]
   },
   {
     key: 'A',
     list: [
       { nonTerminal: "A", initial: ["a"], production: "aA" },
-      { nonTerminal: "A", initial: ["b"], production: "-" },
-      { nonTerminal: "A", initial: ["c"], production: "-" },
-      { nonTerminal: "A", initial: ["d"], production: "d" },
-      { nonTerminal: "A", initial: ["$"], production: "-" },
+      { nonTerminal: "A", initial: ["d"], production: "d" }
     ]
   },
   {
     key: 'B',
     list: [
-      { nonTerminal: "B", initial: ["a"], production: "-" },
       { nonTerminal: "B", initial: ["b"], production: "b" },
-      { nonTerminal: "B", initial: ["c"], production: "-" },
-      { nonTerminal: "B", initial: ["d"], production: end },
-      { nonTerminal: "B", initial: ["$"], production: "-" }
+      { nonTerminal: "B", initial: ["d"], production: ended }
     ]
   },
   {
     key: 'C',
     list: [
-      { nonTerminal: "C", initial: ["a"], production: end },
-      { nonTerminal: "c", initial: ["b"], production: "-" },
-      { nonTerminal: "C", initial: ["c"], production: "cS" },
-      { nonTerminal: "C", initial: ["d"], production: "-" },
-      { nonTerminal: "C", initial: ["$"], production: "-" }
+      { nonTerminal: "C", initial: ["a"], production: ended },
+      { nonTerminal: "C", initial: ["c"], production: "cS" }
     ]
   }
 ];
@@ -53,7 +42,8 @@ export const getTerminal = () => {
 };
 
 function SentenceFunc() {
-  let sentence = "S", steps = 0;
+  let sentence = "S";
+  let steps = 0;
   while (steps < 15) {
     const match = sentence.match(/[A-Z]/);
     if (!match) return sentence;
@@ -62,10 +52,52 @@ function SentenceFunc() {
     const rule = grammar.find(r => r.key === nTerminal);
     const prod = rule.list[Math.floor(Math.random() * rule.list.length)];
 
-    sentence = sentence.replace(nTerminal, prod.production !== end ? prod.production : '');
+    sentence = sentence.replace(nTerminal, prod.production !== ended ? prod.production : '');
     steps++;
   }
   return SentenceFunc();
+}
+
+export function next({ entry, sentence, pile, iteration, end, resolver, log }) {
+  if (!sentence.length) return { entry, sentence, pile, iteration, end: true, resolver, log };
+
+  if (end) {
+    return {
+      entry: sentence + "$", sentence, pile: "$S", iteration: 0, end: false, resolver: [], log: ''
+    };
+  }
+
+  entry ||= sentence + "$";
+  const charPile = pile.slice(-1);
+  const pileTable = pile;
+  const entryTable = entry;
+  pile = pile.slice(0, -1);
+  iteration++;
+  let action = "";
+
+  if (charPile === entry[0] && charPile === "$") {
+    action = `Accept in ${iteration} iterations`;
+    end = true;
+  } else if (charPile && charPile === charPile.toUpperCase()) {
+    const prod = grammar(charPile, entry[0]);
+    if (prod) {
+      action = `${prod.nonTerminal} -> ${prod.production}`;
+      if (prod.production !== ended) pile += prod.production.split('').reverse().join('');
+    } else {
+      end = true;
+      action = `Error in ${iteration} iterations!`;
+    }
+  } else if (charPile === entry[0]) {
+    action = `Read '${entry[0]}'`;
+    log += entry[0];
+    entry = entry.slice(1);
+  } else {
+    end = true;
+    action = `Error in ${iteration} iterations!`;
+  }
+
+  resolver.push([pileTable, entryTable, action]);
+  return { entry, sentence, pile, iteration, end, resolver, topEntry: entry[0], action, log };
 }
 
 export const ControllerGlobal = create((set) => ({
@@ -94,7 +126,11 @@ export const ControllerGlobal = create((set) => ({
     }),
     changeSentenceGrammar: (s) => set(state => ({
       state: { ...state.state, sentence: s, resolver: [], iteration: 0, pile: "$S", entry: "", end: false, action: '', topEntry: s[0], log: '' }
-    }))
+    })),
+    next: () => set(state => {
+      const newState = next(state.state);
+      return { state: { ...state.state, ...newState } };
+    }),
   }
 }));
 
