@@ -7,30 +7,30 @@ export const grammar = [
   {
     key: 'S',
     list: [
-      { nonTerminal: "S", initial: ["a"], production: "aA" },
-      { nonTerminal: "S", initial: ["b"], production: "bB" },
-      { nonTerminal: "S", initial: ["c"], production: "Cc" }
+      { nonTerminal: "S", initial: ["a"], production: "aBb" },
+      { nonTerminal: "S", initial: ["b"], production: "bAc" },
+      { nonTerminal: "S", initial: ["c"], production: "cCb" }
     ]
   },
   {
     key: 'A',
     list: [
-      { nonTerminal: "A", initial: ["a"], production: "aA" },
-      { nonTerminal: "A", initial: ["d"], production: "d" }
+      { nonTerminal: "A", initial: ["a"], production: "aCb" },
+      { nonTerminal: "A", initial: ["b", "c"], production: ended } // 
     ]
   },
   {
     key: 'B',
     list: [
-      { nonTerminal: "B", initial: ["b"], production: "b" },
-      { nonTerminal: "B", initial: ["d"], production: ended }
+      { nonTerminal: "B", initial: ["a"], production: "aCa" },
+      { nonTerminal: "B", initial: ["b"], production: "bAb" }
     ]
   },
   {
     key: 'C',
     list: [
-      { nonTerminal: "C", initial: ["a"], production: ended },
-      { nonTerminal: "C", initial: ["c"], production: "cS" }
+      { nonTerminal: "C", initial: ["a"], production: "aB" },
+      { nonTerminal: "C", initial: ["c"], production: "cAc" }
     ]
   }
 ];
@@ -60,6 +60,7 @@ function SentenceFunc() {
     sentence = sentence.replace(nTerminal, prod.production !== ended ? prod.production : '');
     steps++;
   }
+
   return SentenceFunc();
 }
 

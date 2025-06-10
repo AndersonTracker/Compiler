@@ -4,9 +4,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button } from "react-bootstrap";
 import { ControllerGlobal } from './utils/ControllerGlobal';
 import { Toaster } from 'react-hot-toast';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import TableFirstFollow from './utils/TableFirstFollow';
 
 function App() {
+  const [OpenModal, setOpenModal] = useState(false);
   const { state: { resolver, iteration } } = ControllerGlobal();
   const tableRef = useRef(null);
   const { 
@@ -31,7 +33,7 @@ function App() {
       <Toaster />
       <div className="mt-3 d-flex justify-content-center">
         <div className="col-md-11">
-          <h3 className="m-2 text-center border">Table Parser
+          <h3 className="m-2 text-center border">Table Driven Parser
           </h3>
           <div className=" justify-content-between my-3">
 
@@ -46,7 +48,8 @@ function App() {
                 <Button className="btn btn-warning" style={{ border: 'none', fontWeight: 'bolder' }} onClick={next}>Next</Button>
                 <Button style={{ backgroundColor: 'green', color: 'black', border: 'none', fontWeight: 'bolder' }} onClick={ResolverSentence} >Resolver Sentence</Button>
                 
-                <Button style={{ backgroundColor: 'black', color: 'white', border: 'none', fontWeight: 'bolder', marginLeft: "auto"}} >Table</Button>
+                <Button style={{ backgroundColor: 'black', color: 'white', border: 'none', fontWeight: 'bolder', marginLeft: "auto"}} onClick={() => setOpenModal(true)} >Table</Button>
+                <TableFirstFollow show={OpenModal} onHide={() => setOpenModal(false)} />
             </div>
            
           </div>
