@@ -41,6 +41,11 @@ export const getTerminal = () => {
   )).sort().concat('$');
 };
 
+function searchProduction(pile, char) {
+  const nonTerminal = grammar.find(rule => rule.key === pile);
+  return nonTerminal?.list.find(prod => prod.nonTerminal === pile && prod.initial.includes(char)) || false;
+}
+
 function SentenceFunc() {
   let sentence = "S";
   let steps = 0;
@@ -79,7 +84,7 @@ export function next({ entry, sentence, pile, iteration, end, resolver, log }) {
     action = `Accept in ${iteration} iterations`;
     end = true;
   } else if (charPile && charPile === charPile.toUpperCase()) {
-    const prod = grammar(charPile, entry[0]);
+    const prod = searchProduction(charPile, entry[0]);
     if (prod) {
       action = `${prod.nonTerminal} -> ${prod.production}`;
       if (prod.production !== ended) pile += prod.production.split('').reverse().join('');
